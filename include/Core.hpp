@@ -2,7 +2,7 @@
 #define SERVER_H_
 
 #include <iostream>
-#include <boost/asio.hpp>
+#include "E://Program Files/boost_1_55_0/boost/asio.hpp"
 
 /**
  * NameSpace for Core system, who contains Server / Client Libs
@@ -19,7 +19,7 @@ namespace Core
         ~Server();
 
         void do_connection();
-        void do_checkAuth(string* Nick);
+        void do_checkAuth(std::string* Nick);
 
 
     };
@@ -29,22 +29,81 @@ namespace Core
         Log();
         ~Log();       
 
-        template< typename ...Args>
-        inline std::ofstream& operator << (Args&&... args)
-        {
-            std::f
-        }
     };
 
-    class Client
-    {
-        
-    };
+	class Client
+	{
+	
+	public:
+		enum { header_length = 4 };
+		enum { max_body_length = 512 };
 
-    class MemoryAlocation()
-    {
+		Client(): body_length_(0)
+		{
+		}
 
-    };
+		const char* data() const
+		{
+			return data_;
+		}
+
+		char* data()
+		{
+			return data_;
+		}
+
+		std::size_t length() const
+		{
+			return header_length + body_length_;
+		}
+
+		const char* body() const
+		{
+			return data_ + header_length;
+		}
+
+		char* body()
+		{
+			return data_ + header_length;
+		}
+
+		std::size_t body_length() const
+		{
+			return body_length_;
+		}
+
+		void body_length(std::size_t new_length)
+		{
+			body_length_ = new_length;
+			if (body_length_ > max_body_length)
+				body_length_ = max_body_length;
+		}
+
+		bool decode_header()
+		{
+			char header[header_length + 1] = "";
+			std::strncat(header, data_, header_length);
+			body_length_ = std::atoi(header);
+			if (body_length_ > max_body_length)
+			{
+				body_length_ = 0;
+				return false;
+			}
+			return true;
+		}
+
+		void encode_header()
+		{
+			char header[header_length + 1] = "";
+			std::sprintf(header, "%4d", body_length_);
+			std::memcpy(data_, header, header_length);
+		}
+
+	private:
+		char data_[header_length + max_body_length];
+		std::size_t body_length_;
+	};
+
 }
 
 #endif
