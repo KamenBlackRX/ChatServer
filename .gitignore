@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+#Directories 
+bin/
+bin/*
+build/
+build/*
